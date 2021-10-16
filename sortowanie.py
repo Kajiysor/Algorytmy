@@ -32,14 +32,14 @@ def bubbleSort(arr):
 
 # Insertion Sort
 def insertionSort(arr):
-    il_por = 0
+    il_por = 1
     il_przes = 0
 
     for i in range(1, len(arr)):
         x = arr[i]
         j = i-1
         
-        while((j >= 0) and (arr[j] > x)):
+        while((j >= 0) & (arr[j] > x)):
             il_por += 1
             il_przes += 1
             arr[j+1] = arr[j]
@@ -69,7 +69,7 @@ ilosc_operacji_bubble = []
 ilosc_operacji_insertion = []
 ilosc_elementow_tablicy = []
 
-for k in range(0, 600):
+for k in range(0, 500):
     B = []
     randomizeArray(B, k)
     out3 = bubbleSort(B)
