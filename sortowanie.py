@@ -11,13 +11,15 @@ def randomizeArray(arr, arr_size):
     for _ in range(arr_size):
         arr.append(randint(0, arr_size)) 
 
-# Bublle Sort
+# Bubble Sort -> Złożoność O(n)*O(n) = O(n^2)
 def bubbleSort(arr):
     il_por = 0
     il_przes = 0
 
     n = len(arr)
+    # Pętla while -> złożoność O(n)
     while(n>0):
+        # Pętla for -> złożoność O(n)
         for i in range(0, n-1):
             il_por += 1
             if(arr[i] > arr[i+1]):
@@ -28,15 +30,15 @@ def bubbleSort(arr):
         n -= 1
     return [il_por, il_przes]
 
-# Insertion Sort
+# Insertion Sort -> Złożoność O(n)*O(n) = O(n^2)
 def insertionSort(arr):
     il_por = 1
     il_przes = 0
-
+    # Pętla for -> złożoność O(n)
     for i in range(1, len(arr)):
         x = arr[i]
         j = i-1
-        
+        # Pętla while -> złożoność O(n)
         while((j >= 0) & (arr[j] > x)):
             il_por += 1
             il_przes += 1
