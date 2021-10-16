@@ -48,20 +48,20 @@ def insertionSort(arr):
         arr[j+1] = x
     return [il_por, il_przes]
 
-randomizeArray(A, 120)
-print("Nieposortowana tablica: ", A)
+randomizeArray(A, 1000)
+#print("Nieposortowana tablica: ", A)
 
 out1 = bubbleSort(A)
-print("Bubble Sort wynik: ", A)
+#print("Bubble Sort wynik: ", A)
 print("Ilosc operacji porownania: ", out1[0])
 print("Ilosc operacji przestawienia: ", out1[1])
 
 print("\n\n")
-randomizeArray(A, 120)
-print("Nieposortowana tablica: ", A)
+randomizeArray(A, 1000)
+#print("Nieposortowana tablica: ", A)
 
 out2 = insertionSort(A)
-print("Insertion Sort wynik: ", A)
+#print("Insertion Sort wynik: ", A)
 print("Ilosc operacji porownania: ", out2[0])
 print("Ilosc operacji przestawienia: ", out2[1])
 
