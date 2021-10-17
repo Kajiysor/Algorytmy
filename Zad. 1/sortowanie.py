@@ -73,10 +73,10 @@ for k in range(0, 500):
     B = []
     randomizeArray(B, k)
     out3 = bubbleSort(B)
-    ilosc_operacji_bubble.append(out3[0])
+    ilosc_operacji_bubble.append(out3[0]+out3[1])
     randomizeArray(B, k)
     out4 = insertionSort(B)
-    ilosc_operacji_insertion.append(out4[0])
+    ilosc_operacji_insertion.append(out4[0]+out4[1])
     ilosc_elementow_tablicy.append(k)
 
 
