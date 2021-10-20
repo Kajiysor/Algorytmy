@@ -68,6 +68,8 @@ print("Ilosc operacji przestawienia: ", out2[1])
 ilosc_operacji_bubble = []
 ilosc_operacji_insertion = []
 ilosc_elementow_tablicy = []
+wartosc_funkcji_kwadratowej1 = []
+wartosc_funkcji_kwadratowej2 = []
 
 for k in range(0, 500):
     B = []
@@ -78,12 +80,16 @@ for k in range(0, 500):
     out4 = insertionSort(B)
     ilosc_operacji_insertion.append(out4[0]+out4[1])
     ilosc_elementow_tablicy.append(k)
+    wartosc_funkcji_kwadratowej1.append(0.5*(k**2))
+    wartosc_funkcji_kwadratowej2.append(0.75*(k**2))
 
 
 
 plt.plot(ilosc_elementow_tablicy, ilosc_operacji_bubble)
 plt.plot(ilosc_elementow_tablicy, ilosc_operacji_insertion)
+plt.plot(ilosc_elementow_tablicy, wartosc_funkcji_kwadratowej1)
+plt.plot(ilosc_elementow_tablicy, wartosc_funkcji_kwadratowej2)
 plt.xlabel("Ilosc elementow w tablicy")
 plt.ylabel("Ilosc Operacji")
-plt.legend(["Bubble Sort", "Insertion Sort"])
+plt.legend(["Bubble Sort", "Insertion Sort", "0.5*x^2", "0.75*x^2"])
 plt.savefig("sortowanie.png")
