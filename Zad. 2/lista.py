@@ -130,6 +130,7 @@ def list_remove_index(index = -1):
         for i in range(size-2):
             next = lista[next][POINTER]
         lista[lista[next][POINTER]][POINTER] = EMPTY
+        value = lista[lista[next][POINTER]][ELEMENT]
         lista[lista[next][POINTER]][ELEMENT] = 0
         lista[next][POINTER] = LIST_END
         size -= 1
@@ -137,6 +138,7 @@ def list_remove_index(index = -1):
         temp = head
         head = lista[head][POINTER]
         lista[temp][POINTER] = EMPTY
+        value = lista[temp][ELEMENT]
         lista[temp][ELEMENT] = 0
         size -= 1
     else:
@@ -146,16 +148,17 @@ def list_remove_index(index = -1):
         temp = lista[next][POINTER]
         lista[next][POINTER] = lista[lista[next][POINTER]][POINTER]
         lista[temp][POINTER] = EMPTY
+        value = lista[temp][ELEMENT]
         lista[temp][ELEMENT] = 0
         size -= 1
 
-    print(f"Element spod indeksu {index} zostal usuniety")  
+    print(f"Element o wartosci {value} spod indeksu {index} zostal usuniety")  
 
 def list_remove_element(elmt):
     pos = list_contains(elmt)
     if (pos != -999):
         list_remove_index(pos)
-        print(f"Element {elmt} zostal usuniety z listy")
+        # print(f"Element {elmt} zostal usuniety z listy")
     # else:
     #     print(f"Elementu {elmt} nie ma na liscie wiec nie zostal usuniety")  
 
@@ -176,6 +179,8 @@ list_contains(9)
 print("==================================")
 print("Wywolanie metody remove_index(): \n")
 list_remove_index(3)
+print_list()
+print(lista)
 print("==================================")
 print("Wywolanie metody remove_element(): \n")
 list_remove_element(3)
@@ -190,6 +195,16 @@ print("==================================")
 print_list()
 print(lista)
 print("==================================")
+# print("Usuniecie ostatniego elementu")
+# list_add(77)
+# list_add(99)
+# list_remove_index()
+# list_remove_index()
+# list_add(55)
+# print("==================================")
+# print_list()
+# print(lista)
+# print("==================================")
 # list_add(77, 0)
 # print_list()
 # print(lista)
