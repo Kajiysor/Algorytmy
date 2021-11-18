@@ -36,6 +36,29 @@ public:
             tail = tail->next;
         }
     }
+    void del (int pos)
+    {
+        node *current = new node;
+        node *previous = new node;
+        current = head;
+        for (int i = 1; i < pos; i++){
+            previous = current;
+            current = current -> next;
+        }
+        previous -> next = current -> next;
+        
+    }
+
+    void display()
+    {
+        node *tmp;
+        tmp = head;
+        while (tmp != NULL)
+        {
+            cout << tmp->data << endl;
+            tmp = tmp->next;
+        }
+    }
 };
 
 int main()
@@ -43,5 +66,8 @@ int main()
     linked_list a;
     a.add_node(1);
     a.add_node(2);
+    a.add_node(3);
+    a.del(2);
+    a.display();
     return 0;
 }
