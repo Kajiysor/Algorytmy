@@ -51,6 +51,7 @@ class Base:
                 continue
             self.temp_dict.update(
                 {point.point_name: self.point_distance(point_1, point)})
+
         self.nearest = min(self.temp_dict.items(), key=lambda x: x[1])
         print(
             f"The nearest point to {point_1.coords_array} is {self.nearest[0]} and it's distance is {self.nearest[1]}")
