@@ -49,8 +49,11 @@ class Base:
         for point in self.list_of_points:
             if point is point_1:
                 continue
+            self.temp_distance = self.point_distance(point_1, point)
             self.temp_dict.update(
-                {point.point_name: self.point_distance(point_1, point)})
+                {point.point_name: self.temp_distance})
+            if self.temp_distance == 0:
+                break
 
         self.nearest = min(self.temp_dict.items(), key=lambda x: x[1])
         print(
@@ -62,7 +65,7 @@ class Base:
 def main():
     point1 = Point([1, 2])
     point2 = Point([3, 4, 5])
-    point3 = Point([1, 2, 6])
+    point3 = Point([1, 2, 7])
     point4 = Point([4, 5, 6])
     point5 = Point([1, 2, 3, ])
 
