@@ -1,7 +1,6 @@
 import numpy as np
 from typing import List, Tuple
 import math
-
 # D - wymiar przestrzeni
 D = 3
 
@@ -77,7 +76,7 @@ def main():
     b.print_base()
 
     #print(b.point_distance(point1, point2))
-    b.find_nearest_point(point1)
+    b.find_nearest_point(point2)
 
 
 if __name__ == "__main__":
