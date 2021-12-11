@@ -2,8 +2,10 @@ import numpy as np
 import scipy.spatial as spatial
 from typing import List, Tuple
 import math
+import time
+
 # D - wymiar przestrzeni
-D = 3
+D = 100
 
 
 class Point:
@@ -31,7 +33,6 @@ class Base:
 
     def print_base(self) -> None:
         print("Current base of points: ")
-        self.list_of_points_coords.clear
 
         for point in self.list_of_points:
             self.list_of_points_coords.append(point.coords_array)
@@ -54,27 +55,27 @@ class Base:
                 continue
             self.temp_distance = self.point_distance(point_1, point)
             self.temp_dict.update(
-                {point.coords: self.temp_distance})
+                {point.coords_array: self.temp_distance})
             if self.temp_distance == 0:
                 break
 
         self.nearest = min(self.temp_dict.items(), key=lambda x: x[1])
         print(
-            f"The nearest point to {point_1.coords} is {self.nearest[0]} and it's distance is {self.nearest[1]}")
+            f"The nearest point to {point_1.coords_array} is {self.nearest[0]} and it's distance is {self.nearest[1]}")
 
         return self.nearest
 
     def find_nearest_using_kdtree(self, point_1: Point):
-        self.list_of_points_coords.remove(point_1.coords)
+        if point_1 in self.list_of_points:
+            if point_1.coords_array in self.list_of_points_coords:
+                self.list_of_points_coords.remove(point_1.coords_array)
 
-        point_tree = spatial.KDTree(self.list_of_points_coords)
+        self.point_tree = spatial.KDTree(self.list_of_points_coords)
 
-        self.nearest_point_distance, self.nearest_point_id = point_tree.query(
+        self.nearest_point_distance, self.nearest_point_id = self.point_tree.query(
             point_1.coords_array, k=1)
         print(
-            f"The nearest point to {point_1.coords} is {self.list_of_points[self.nearest_point_id].coords} and it's distance is {self.nearest_point_distance}")
-
-        return self.nearest, self.nearest_point_id
+            f"The nearest point to {point_1.coords_array} is {self.list_of_points[self.nearest_point_id].coords_array} and it's distance is {self.nearest_point_distance}")
 
 
 def main():
@@ -82,22 +83,34 @@ def main():
     point2 = Point([3, 4, 5])
     point3 = Point([1, 2, 7])
     point4 = Point([4, 5, 6])
-    point5 = Point([1, 2, 3, ])
+    point5 = Point(list(np.random.randint(1000, size=D)))
 
     b = Base()
     b.add_point(point1)
     b.add_point(point2)
     b.add_point(point3)
     b.add_point(point4)
+    b.add_point(point5)
+    for x in range(100000):
+        tmp_array = list(np.random.randint(1000, size=D))
+        b.add_point(Point(tmp_array))
     print("========================")
     b.print_base()
 
     print("===================================================================================")
     print("Using brute force:")
-    b.find_nearest_point(point4)
+    startMilis1 = int(round(time.time()*1000))
+    b.find_nearest_point(point5)
+    endMilis1 = int(round(time.time()*1000))
+    timeTaken1 = endMilis1 - startMilis1
+    print(f"{timeTaken1 = } [ms]")
     print("===================================================================================")
     print("Using kdtree:")
-    b.find_nearest_using_kdtree(point4)
+    startMilis2 = int(round(time.time()*1000))
+    b.find_nearest_using_kdtree(point5)
+    endMilis2 = int(round(time.time()*1000))
+    timeTaken2 = endMilis2 - startMilis2
+    print(f"{timeTaken2 = } [ms]")
     print("===================================================================================")
 
 
