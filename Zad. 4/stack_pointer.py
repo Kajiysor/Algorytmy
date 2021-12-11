@@ -1,73 +1,61 @@
-# Python program to demonstrate
-# stack implementation using a linked list.
-# node class
- 
+
 class Node:
-    def __init__(self, value):
-        self.value = value
+
+    def __init__(self, data):
+        self.data = data
         self.next = None
- 
- 
+
+
 class Stack:
- 
-    # Initializing a stack.
-    # Use a dummy node, which is
-    # easier for handling edge cases.
+
     def __init__(self):
         self.head = Node("head")
         self.size = 0
- 
-    # String representation of the stack
-    def __str__(self):
-        cur = self.head.next
-        out = ""
-        while cur:
-            out += "->" + str(cur.value)
-            cur = cur.next
-        return out[:-3]
- 
-    # Get the current size of the stack
-    def getSize(self):
-        return self.size
- 
-    # Check if the stack is empty
-    def isEmpty(self):
-        return self.size == 0
- 
-    # Get the top item of the stack
-    def peek(self):
- 
-        # Sanitary check to see if we
-        # are peeking an empty stack.
-        if self.isEmpty():
-            raise Exception("Peeking from an empty stack")
-        return self.head.next.value
- 
-    # Push a value into the stack.
-    def push(self, value):
-        node = Node(value)
+
+    def push(self, data):
+        node = Node(data)
         node.next = self.head.next
         self.head.next = node
         self.size += 1
- 
-    # Remove a value from the stack and return.
+
     def pop(self):
         if self.isEmpty():
-            raise Exception("Popping from an empty stack")
-        remove = self.head.next
+            raise Exception("Can't pop from empty stack!")
+        popped_item = self.head.next
         self.head.next = self.head.next.next
         self.size -= 1
-        return remove.value
- 
- 
-# Driver Code
+        print(f"Popped {popped_item.data} from stack")
+
+    def peek(self):
+        if self.isEmpty():
+            raise Exception("Can't peek from empty stack!")
+        print(f"{self.head.next.data} is on top of the stack")
+
+    def getSize(self):
+        return self.size
+
+    def isEmpty(self):
+        return self.size == 0
+
+    def display(self):
+        current = self.head.next
+        print("==============")
+        print("Current stack: ")
+        print("==============")
+        while current:
+            print(current.data)
+            current = current.next
+        print("==============")
+
+
 if __name__ == "__main__":
     stack = Stack()
     for i in range(11):
         stack.push(i)
-    print(f"Stack: {stack}")
- 
+    stack.display()
+
     for _ in range(1, 6):
-        remove = stack.pop()
-        print(f"Pop: {remove}")
-    print(f"Stack: {stack}")
+        stack.pop()
+    stack.display()
+
+    stack.peek()
