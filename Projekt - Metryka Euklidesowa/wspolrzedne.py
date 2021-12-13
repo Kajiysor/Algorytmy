@@ -75,7 +75,7 @@ class Base:
         self.nearest_point_distance, self.nearest_point_id = self.point_tree.query(
             point_1.coords_array, k=1)
         print(
-            f"The nearest point to {point_1.coords_array} is {self.list_of_points[self.nearest_point_id].coords_array} and it's distance is {self.nearest_point_distance}")
+            f"The nearest point to {point_1.coords_array} is {self.list_of_points_coords[self.nearest_point_id]} and it's distance is {self.nearest_point_distance}")
 
 
 def main():
