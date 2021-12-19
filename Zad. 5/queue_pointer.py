@@ -33,7 +33,6 @@ class Queue:
     def dequeue(self):
         if self.isEmpty():
             raise Exception("Can't dequeue from empty queue!")
-        #popped_item = self.head.next
         dequeued = self.head.next
         self.head.next = dequeued.next
         dequeued.next.prev = self.head
