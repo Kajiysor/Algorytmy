@@ -92,7 +92,7 @@ def main():
     b.add_point(point4)
     b.add_point(point5)
     for x in range(100000):
-        tmp_array = list(np.random.randint(1000, size=D))
+        tmp_array = list(np.random.randint(low = -1000, high=1000, size=D))
         b.add_point(Point(tmp_array))
     print("========================")
     b.print_base()
