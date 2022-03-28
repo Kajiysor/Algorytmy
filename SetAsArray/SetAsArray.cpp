@@ -67,7 +67,7 @@ class SetAsArray : public Set<int> {
     int index;
 
   public:
-    ~Iter();
+    ~Iter(){};
     Iter(std::vector<bool> array, int us) {
       data.assign(array.begin(), array.end());
       universeSize = us;
