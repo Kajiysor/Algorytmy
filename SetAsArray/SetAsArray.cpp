@@ -1,6 +1,14 @@
 #include <iostream>
 #include <vector>
 
+template <typename T> class Iterator {
+public:
+  Iterator(){};
+  virtual ~Iterator(){};
+  virtual bool isDone() const = 0;
+  const virtual T &operator*() = 0;
+  virtual void operator++() = 0;
+};
 template <typename T> class Visitor {
 public:
   virtual void Visit(T &element){};
@@ -53,6 +61,42 @@ protected:
 };
 
 class SetAsArray : public Set<int> {
+  class Iter : public Iterator<int> {
+    std::vector<bool> data;
+    int universeSize;
+    int index;
+
+  public:
+    ~Iter();
+    Iter(std::vector<bool> array, int us) {
+      data.assign(array.begin(), array.end());
+      universeSize = us;
+      for (auto i = 0; i < universeSize; i++) {
+        if (data[i] == true) {
+          index = i;
+          break;
+        }
+      }
+    }
+
+    const int &operator*() { return index; }
+
+    void operator++() {
+      for (auto i = index; i < universeSize; i++) {
+        if (data[i] == true) {
+          index = i;
+          break;
+        }
+      }
+    }
+    bool isDone() const {
+      if (index >= universeSize)
+        return true;
+      else
+        return false;
+    }
+  };
+
 public:
   SetAsArray(unsigned int n) : Set(n), array(n, false) {}
   bool IsFull() const { return Count() == UniverseSize(); }
@@ -163,6 +207,16 @@ public:
     }
   }
 
+  Iter &NewIterator() { return *new Iter(array, universeSize); }
+
+  void ShowViaIter() {
+    auto testIter = NewIterator();
+    while (!testIter.isDone()) {
+      std::cout << *testIter << std::endl;
+      ++testIter;
+    }
+  }
+
 private:
   std::vector<bool> array;
 };
@@ -175,6 +229,7 @@ void Test() {
   for (int i = 0; i < 10; i++)
     !(i % 2) ? A.Insert(i) : B.Insert(i);
 
+  A.ShowViaIter();
   // SetAsArray Test
   C = A + B;
   D = C - B;
