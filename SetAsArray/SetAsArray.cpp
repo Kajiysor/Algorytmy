@@ -5,14 +5,14 @@ template <typename T> class Iterator {
 public:
   Iterator(){};
   virtual ~Iterator(){};
-  virtual bool isDone() const = 0;
+  virtual bool IsDone() const = 0;
   const virtual T &operator*() = 0;
   virtual void operator++() = 0;
 };
 template <typename T> class Visitor {
 public:
   virtual void Visit(T &element){};
-  virtual bool IsDone() const { return false; }
+  virtual bool IsDone() const { return false; };
 };
 
 class PrintVisitor : public Visitor<int> {
@@ -32,6 +32,19 @@ public:
 
 private:
   int sum{0};
+};
+
+class OddVisitor : public Visitor<int> {
+  bool odd{false};
+
+public:
+  void Visit(int &element) {
+    odd = false;
+    if (element != 0 && element % 2 != 0) {
+      odd = true;
+    }
+  }
+  bool IsDone() const { return odd; }
 };
 
 template <typename T> class Container {
@@ -63,15 +76,16 @@ protected:
 class SetAsArray : public Set<int> {
   class Iter : public Iterator<int> {
     std::vector<bool> data;
-    int universeSize;
     int index;
+    int universeSize;
+    bool isFinshed{false};
 
   public:
     ~Iter(){};
     Iter(std::vector<bool> array, int us) {
-      data.assign(array.begin(), array.end());
+      data = array;
       universeSize = us;
-      for (auto i = 0; i < universeSize; i++) {
+      for (auto i = 0; i <= universeSize; i++) {
         if (data[i] == true) {
           index = i;
           break;
@@ -82,19 +96,15 @@ class SetAsArray : public Set<int> {
     const int &operator*() { return index; }
 
     void operator++() {
-      for (auto i = index; i < universeSize; i++) {
+      for (auto i = index + 1; i < universeSize; i++) {
         if (data[i] == true) {
           index = i;
-          break;
+          return;
         }
       }
+      isFinshed = true;
     }
-    bool isDone() const {
-      if (index >= universeSize)
-        return true;
-      else
-        return false;
-    }
+    bool IsDone() const { return isFinshed; }
   };
 
 public:
@@ -202,8 +212,15 @@ public:
 
   void Accept(Visitor<int> &v) const {
     for (int i = 0; i < universeSize; i++) {
-      if (array[i])
+      if (array[i]) {
         v.Visit(i);
+        if (v.IsDone()) {
+          std::cout << "Accept finished at cell : " << i << std::endl;
+          return;
+        }
+      }
+      // if (i == (universeSize - 1) && !v.IsDone())
+      //   std::cout << "Coulnd't visit any element!" << std::endl;
     }
   }
 
@@ -211,7 +228,7 @@ public:
 
   void ShowViaIter() {
     auto testIter = NewIterator();
-    while (!testIter.isDone()) {
+    while (!testIter.IsDone()) {
       std::cout << *testIter << std::endl;
       ++testIter;
     }
@@ -229,10 +246,14 @@ void Test() {
   for (int i = 0; i < 10; i++)
     !(i % 2) ? A.Insert(i) : B.Insert(i);
 
-  A.ShowViaIter();
   // SetAsArray Test
   C = A + B;
   D = C - B;
+  std::cout << "A via Iter: " << std::endl;
+  A.ShowViaIter();
+  std::cout << "B via Iter: " << std::endl;
+  B.ShowViaIter();
+
   std::cout << "A = ";
   A.Show();
   std::cout << "Ilosc elementow w A: " << A.Count() << std::endl;
@@ -256,7 +277,7 @@ void Test() {
   std::cout << "D <= A: " << (D <= A) << std::endl;
 
   // Visitor Test
-  std::cout << std::endl;
+  std::cout << std::endl << "AddingVisitor test" << std::endl;
   A.Insert(5);
   AddingVisitor addingVisitor;
   A.Accept(addingVisitor);
@@ -267,6 +288,18 @@ void Test() {
   E.Withdraw(1);
   E.Accept(addingVisitor);
   std::cout << "E Sum = " << addingVisitor.Result() << std::endl;
+
+  std::cout << std::endl << "OddVisitor test" << std::endl;
+  OddVisitor oddVisitor;
+  std::cout << "B accepted oddVisior!" << std::endl;
+  B.Accept(oddVisitor);
+  std::cout << "A accepted oddVisior!" << std::endl;
+  A.Accept(oddVisitor);
+  A.Withdraw(1);
+  A.Withdraw(5);
+  std::cout << "A accepted oddVisior!" << std::endl;
+  A.Accept(oddVisitor);
+
   std::cout << "==== Test Finished ====" << std::endl;
 }
 
