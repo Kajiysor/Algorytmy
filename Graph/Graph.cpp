@@ -2,6 +2,15 @@
 #include <vector>
 
 #define LOG(msg) std::cout << msg << std::endl;
+
+template <typename T> class Iterator {
+public:
+  Iterator(){};
+  virtual ~Iterator(){};
+  virtual bool IsDone() = 0;
+  const virtual T &operator*() = 0;
+  virtual void operator++() = 0;
+};
 class Vertex {
 private:
   unsigned int number;
@@ -49,6 +58,91 @@ public:
       adjacencyMatrix.push_back(std::vector<Edge *>(n, nullptr));
     }
   }
+
+  void ShowVertices() {
+    auto &allVerticesIter = *new AllVerticesIter(*this);
+    while (!allVerticesIter.IsDone()) {
+      const auto &v = *allVerticesIter;
+      LOG("allVerticesIter vertex value: " << v.Number());
+      ++allVerticesIter;
+    }
+  }
+
+  void ShowEdges() {
+    auto &allEdgesIter = *new AllEdgesIter(*this);
+    while (!allEdgesIter.IsDone()) {
+      auto edge = *allEdgesIter;
+      const auto &v0 = edge.V0()->Number();
+      const auto &v1 = edge.V1()->Number();
+      LOG("Edge vertices: v0: " << v0 << " v1: " << v1);
+      ++allEdgesIter;
+    }
+  }
+
+  class AllVerticesIter : public Iterator<Vertex> {
+    GraphAsMatrix &owner;
+    int current;
+
+  public:
+    ~AllVerticesIter() {}
+    AllVerticesIter(GraphAsMatrix &owner) : owner(owner), current(0) {}
+    bool IsDone() { return current >= owner.vertices.size() ? true : false; }
+    Vertex &operator*() { return *owner.vertices[current]; }
+    void operator++() { current++; }
+  };
+  class AllEdgesIter : public Iterator<Edge> {
+    GraphAsMatrix &owner;
+    int row{0};
+    int col{0};
+
+  public:
+    void Next() {
+      while (true) {
+        if (owner.adjacencyMatrix[row][col])
+          break;
+        col++;
+        if (col >= owner.numberOfVertices) {
+          col = 0;
+          row++;
+        }
+        if (row >= owner.numberOfVertices && col == owner.numberOfVertices)
+          break;
+      }
+    }
+    AllEdgesIter(GraphAsMatrix &owner) : owner(owner) { Next(); }
+    bool IsDone() {
+      return (row >= owner.numberOfVertices && col >= owner.numberOfVertices)
+                 ? true
+                 : false;
+    }
+    Edge &operator*() { return *owner.adjacencyMatrix[row][col]; }
+    void operator++() { Next(); }
+  };
+  class EmanEdgesIter : public Iterator<Edge> {
+    GraphAsMatrix &owner;
+    int row;
+    int col;
+
+  public:
+    void Next();
+    EmanEdgesIter(GraphAsMatrix &owner, int v);
+    bool IsDone();
+    Edge &operator*();
+    void operator++() { Next(); }
+  };
+  class InciEdgesIter : public Iterator<Edge> {
+    GraphAsMatrix &owner;
+    int row;
+    int col;
+
+  public:
+    void Next();
+    InciEdgesIter(GraphAsMatrix &owner, int v);
+    bool IsDone();
+    Edge &operator*();
+    void operator++() { Next(); }
+  };
+
   int NumberOfVertices() { return numberOfVertices; }
   bool IsDirected() { return isDirected; }
   int NumberOfEdges() { return numberOfEdges; }
@@ -136,6 +230,8 @@ void test(bool isDirected) {
   edgeTest(graph, 2, 3);
   edgeTest(graph, 3, 4);
   edgeTest(graph, 9, 9);
+
+  graph->ShowEdges();
 
   delete graph;
 
