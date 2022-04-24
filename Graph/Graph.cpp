@@ -63,7 +63,8 @@ public:
     auto &allVerticesIter = *new AllVerticesIter(*this);
     while (!allVerticesIter.IsDone()) {
       const auto &v = *allVerticesIter;
-      LOG("allVerticesIter vertex value: " << v.Number());
+      LOG("allVerticesIter vertex number: " << v.Number()
+                                            << " vertex weight: " << v.weight);
       ++allVerticesIter;
     }
   }
@@ -71,11 +72,30 @@ public:
   void ShowEdges() {
     auto &allEdgesIter = *new AllEdgesIter(*this);
     while (!allEdgesIter.IsDone()) {
-      auto edge = *allEdgesIter;
-      const auto &v0 = edge.V0()->Number();
-      const auto &v1 = edge.V1()->Number();
-      LOG("Edge vertices: v0: " << v0 << " v1: " << v1);
+      const auto &edge = *allEdgesIter;
+      LOG("Edge vertices:   v0: " << edge.V0()->Number()
+                                  << "    v1: " << edge.V1()->Number());
       ++allEdgesIter;
+    }
+  }
+
+  void ShowEmamEdges(int v) {
+    auto &emanEdgesIter = *new EmanEdgesIter(*this, v);
+    while (!emanEdgesIter.IsDone()) {
+      const auto &edge = *emanEdgesIter;
+      LOG("Eman edge vertices   v0: " << edge.V0()->Number()
+                                      << "    v1: " << edge.V1()->Number());
+      ++emanEdgesIter;
+    }
+  }
+
+  void ShowInciEdges(int v) {
+    auto &inciEdgesIter = *new InciEdgesIter(*this, v);
+    while (!inciEdgesIter.IsDone()) {
+      const auto &edge = *inciEdgesIter;
+      LOG("Inci edge vertices   v0: " << edge.V0()->Number()
+                                      << "    v1: " << edge.V1()->Number());
+      ++inciEdgesIter;
     }
   }
 
@@ -94,52 +114,64 @@ public:
     GraphAsMatrix &owner;
     int row{0};
     int col{0};
+    bool done{false};
 
   public:
     void Next() {
-      while (true) {
-        if (owner.adjacencyMatrix[row][col])
-          break;
-        col++;
-        if (col >= owner.numberOfVertices) {
-          col = 0;
-          row++;
+      for (; row < owner.numberOfVertices; row++) {
+        for (++col; col < owner.numberOfVertices; col++) {
+          if (owner.adjacencyMatrix[row][col])
+            return;
         }
-        if (row >= owner.numberOfVertices && col == owner.numberOfVertices)
-          break;
+        col = -1;
       }
+      done = true;
     }
     AllEdgesIter(GraphAsMatrix &owner) : owner(owner) { Next(); }
-    bool IsDone() {
-      return (row >= owner.numberOfVertices && col >= owner.numberOfVertices)
-                 ? true
-                 : false;
-    }
-    Edge &operator*() { return *owner.adjacencyMatrix[row][col]; }
+    bool IsDone() { return done; }
+    Edge &operator*() { return *owner.SelectEdge(row, col); }
     void operator++() { Next(); }
   };
   class EmanEdgesIter : public Iterator<Edge> {
     GraphAsMatrix &owner;
     int row;
-    int col;
+    int col{-1};
+    bool done{false};
 
   public:
-    void Next();
-    EmanEdgesIter(GraphAsMatrix &owner, int v);
-    bool IsDone();
-    Edge &operator*();
+    void Next() {
+      for (++col; col < owner.numberOfVertices; col++) {
+        if (owner.adjacencyMatrix[row][col])
+          return;
+      }
+      done = true;
+    };
+    EmanEdgesIter(GraphAsMatrix &owner, int v) : owner(owner), row(v) {
+      Next();
+    }
+    bool IsDone() { return done; }
+    Edge &operator*() { return *owner.SelectEdge(row, col); }
     void operator++() { Next(); }
   };
   class InciEdgesIter : public Iterator<Edge> {
     GraphAsMatrix &owner;
-    int row;
+    int row{-1};
     int col;
+    bool done;
 
   public:
-    void Next();
-    InciEdgesIter(GraphAsMatrix &owner, int v);
-    bool IsDone();
-    Edge &operator*();
+    void Next() {
+      for (++row; row < owner.numberOfVertices; row++) {
+        if (owner.adjacencyMatrix[row][col])
+          return;
+      }
+      done = true;
+    }
+    InciEdgesIter(GraphAsMatrix &owner, int v) : owner(owner), col(v) {
+      Next();
+    }
+    bool IsDone() { return done; }
+    Edge &operator*() { return *owner.SelectEdge(row, col); }
     void operator++() { Next(); }
   };
 
@@ -199,7 +231,6 @@ void edgeTest(GraphAsMatrix *graph, unsigned int v1, unsigned int v2) {
   LOG("Mate(v1): " << e->Mate(e->V1())->Number());
   e->weight = e->V0()->Number() + e->V1()->Number();
   LOG("Waga krawedzi: " << e->weight);
-  delete e;
 }
 
 void test(bool isDirected) {
@@ -231,7 +262,17 @@ void test(bool isDirected) {
   edgeTest(graph, 3, 4);
   edgeTest(graph, 9, 9);
 
+  LOG("\n===Testing iterators===");
+
+  graph->ShowVertices();
+
+  graph->AddEdge(3, 5);
+  graph->AddEdge(8, 3);
+  graph->AddEdge(5, 2);
+
   graph->ShowEdges();
+  graph->ShowEmamEdges(3);
+  graph->ShowInciEdges(2);
 
   delete graph;
 
