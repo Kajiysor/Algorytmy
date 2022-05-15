@@ -11,6 +11,13 @@ public:
   const virtual T &operator*() = 0;
   virtual void operator++() = 0;
 };
+
+template <typename T> class Visitor {
+public:
+  virtual void Visit(T &v);
+  virtual bool IsDone() const { return false; }
+};
+
 class Vertex {
 private:
   unsigned int number;
@@ -22,6 +29,24 @@ public:
   std::string label;
   int Number() const { return number; }
 };
+
+class CountingVisitor : Visitor<Vertex> {
+private:
+  int ctr{0};
+  bool verbose{false};
+
+public:
+  void Visit(Vertex &v) {
+    ctr++;
+    if (verbose)
+      LOG("Visiting vertex: " << v.Number());
+  }
+  bool IsDone() { return false; }
+  int GetCounter() { return ctr; }
+  void reset() { ctr = 0; }
+  void SetVerbosity(bool isVerbose) { verbose = isVerbose; }
+};
+
 class Edge {
 protected:
   Vertex *v0;
@@ -101,24 +126,46 @@ public:
   }
 
   void DFS(Vertex *v) {
+    // auto cv = *new CountingVisitor();
+    CountingVisitor cv;
+    cv.SetVerbosity(true);
     std::vector<bool> visitedVertices;
     for (auto i = 0; i < numberOfVertices; i++)
       visitedVertices.push_back(false);
-    DFS1(v, visitedVertices);
+    DFS1(cv, v, visitedVertices);
     for (auto i = 0; i < numberOfVertices; i++)
       if (!visitedVertices[i])
-        DFS1(vertices[i], visitedVertices);
+        DFS1(cv, vertices[i], visitedVertices);
   }
 
-  void DFS1(Vertex *v, std::vector<bool> &visited) {
-    LOG("Visiting vertex: " << v->Number());
+  void DFS1(CountingVisitor &cv, Vertex *v, std::vector<bool> &visited) {
+    // LOG("Visiting vertex: " << v->Number());
+    cv.Visit(*v);
     visited[v->Number()] = true;
     auto &emanEdgesIter = *new EmanEdgesIter(*this, v->Number());
     while (!emanEdgesIter.IsDone()) {
       const auto &edge = *emanEdgesIter;
       if (visited[edge.V1()->Number()] == false)
-        DFS1(edge.V1(), visited);
+        DFS1(cv, edge.V1(), visited);
       ++emanEdgesIter;
+    }
+  }
+
+  bool IsConnected() {
+    CountingVisitor cv;
+    if (!this->isDirected) {
+      std::vector<bool> visited(this->numberOfVertices, false);
+      DFS1(cv, vertices[0], visited);
+      return cv.GetCounter() == this->numberOfVertices;
+    } else {
+      for (int i = 0; i < numberOfVertices; i++) {
+        std::vector<bool> visited(this->numberOfVertices, false);
+        DFS1(cv, vertices[i], visited);
+        if (cv.GetCounter() != this->numberOfVertices)
+          return false;
+        cv.reset();
+      }
+      return true;
     }
   }
 
@@ -256,7 +303,7 @@ void edgeTest(GraphAsMatrix *graph, unsigned int v1, unsigned int v2) {
   LOG("Waga krawedzi: " << e->weight);
 }
 
-void test(bool isDirected) {
+void Test(bool isDirected) {
   LOG("===== Testing for isDirected : " << std::boolalpha << isDirected
                                         << " =====" << std::endl);
   const auto &graph = new GraphAsMatrix(10, isDirected);
@@ -297,16 +344,65 @@ void test(bool isDirected) {
   graph->ShowEmamEdges(3);
   graph->ShowInciEdges(2);
 
-  LOG("\n===Testing DFS===");
-  graph->DFS(graph->SelectVertex(3));
-
   delete graph;
 
   std::cout << std::endl << std::endl;
 }
 
+void TestDFS(bool isDirected) {
+  LOG("\n===== Testing DFS for isDirected : " << std::boolalpha << isDirected
+                                              << " =====" << std::endl);
+  const auto &graph = new GraphAsMatrix(10, isDirected);
+  graph->AddEdge(0, 1);
+  graph->AddEdge(1, 2);
+  graph->AddEdge(2, 3);
+  graph->AddEdge(3, 4);
+  graph->AddEdge(3, 7);
+  graph->AddEdge(4, 5);
+  graph->AddEdge(5, 9);
+  graph->AddEdge(9, 9);
+  graph->AddEdge(6, 8);
+  graph->AddEdge(8, 6);
+  graph->AddEdge(0, 8);
+
+  graph->DFS(graph->SelectVertex(0));
+}
+
+void TestIsConnected(bool isDirected) {
+  LOG("\n===== Testing IsConnected for isDirected : "
+      << std::boolalpha << isDirected << " =====" << std::endl);
+  const auto &graph = new GraphAsMatrix(10, isDirected);
+  graph->AddEdge(0, 1);
+  graph->AddEdge(1, 2);
+  graph->AddEdge(2, 3);
+  graph->AddEdge(3, 4);
+  graph->AddEdge(3, 7);
+  graph->AddEdge(4, 5);
+  graph->AddEdge(5, 9);
+  graph->AddEdge(9, 9);
+  graph->AddEdge(6, 8);
+  graph->AddEdge(8, 6);
+  graph->AddEdge(0, 8);
+  LOG("Graph IsConnected: " << graph->IsConnected());
+  graph->AddEdge(0, 8);
+  LOG("Graph IsConnected: " << graph->IsConnected());
+
+  if (isDirected) {
+    graph->AddEdge(0, 8);
+    graph->AddEdge(6, 0);
+    graph->AddEdge(9, 0);
+    LOG("Graph IsConnected: " << graph->IsConnected());
+    graph->AddEdge(7, 0);
+    LOG("Graph IsConnected: " << graph->IsConnected());
+  }
+}
+
 int main(int argc, char const *argv[]) {
-  test(true);
-  test(false);
+  Test(false);
+  Test(true);
+  TestDFS(false);
+  TestDFS(true);
+  TestIsConnected(false);
+  TestIsConnected(true);
   return 0;
 }
