@@ -126,7 +126,6 @@ public:
   }
 
   void DFS(Vertex *v) {
-    // auto cv = *new CountingVisitor();
     CountingVisitor cv;
     cv.SetVerbosity(true);
     std::vector<bool> visitedVertices;
@@ -139,7 +138,6 @@ public:
   }
 
   void DFS1(CountingVisitor &cv, Vertex *v, std::vector<bool> &visited) {
-    // LOG("Visiting vertex: " << v->Number());
     cv.Visit(*v);
     visited[v->Number()] = true;
     auto &emanEdgesIter = *new EmanEdgesIter(*this, v->Number());
