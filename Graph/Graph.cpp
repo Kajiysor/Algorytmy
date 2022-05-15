@@ -18,6 +18,7 @@ private:
 public:
   Vertex(unsigned int n) { number = n; }
   int weight;
+  bool visited{false};
   std::string label;
   int Number() const { return number; }
 };
@@ -96,6 +97,28 @@ public:
       LOG("Inci edge vertices   v0: " << edge.V0()->Number()
                                       << "    v1: " << edge.V1()->Number());
       ++inciEdgesIter;
+    }
+  }
+
+  void DFS(Vertex *v) {
+    std::vector<bool> visitedVertices;
+    for (auto i = 0; i < numberOfVertices; i++)
+      visitedVertices.push_back(false);
+    DFS1(v, visitedVertices);
+    for (auto i = 0; i < numberOfVertices; i++)
+      if (!visitedVertices[i])
+        DFS1(vertices[i], visitedVertices);
+  }
+
+  void DFS1(Vertex *v, std::vector<bool> &visited) {
+    LOG("Visiting vertex: " << v->Number());
+    visited[v->Number()] = true;
+    auto &emanEdgesIter = *new EmanEdgesIter(*this, v->Number());
+    while (!emanEdgesIter.IsDone()) {
+      const auto &edge = *emanEdgesIter;
+      if (visited[edge.V1()->Number()] == false)
+        DFS1(edge.V1(), visited);
+      ++emanEdgesIter;
     }
   }
 
@@ -273,6 +296,9 @@ void test(bool isDirected) {
   graph->ShowEdges();
   graph->ShowEmamEdges(3);
   graph->ShowInciEdges(2);
+
+  LOG("\n===Testing DFS===");
+  graph->DFS(graph->SelectVertex(3));
 
   delete graph;
 
