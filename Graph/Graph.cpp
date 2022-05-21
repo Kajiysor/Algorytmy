@@ -167,6 +167,20 @@ public:
     }
   }
 
+  unsigned int FindConnectedComponents() {
+    unsigned int connectedComponents{0};
+    CountingVisitor cv;
+    std::vector<bool> visitedVertices(numberOfVertices, false);
+
+    for (auto i = 0; i < numberOfVertices; i++)
+      if (!visitedVertices[i]) {
+        DFS1(cv, vertices[i], visitedVertices);
+        connectedComponents++;
+      }
+    LOG("Connected Components: " << connectedComponents);
+    return connectedComponents;
+  }
+
   class AllVerticesIter : public Iterator<Vertex> {
     GraphAsMatrix &owner;
     int current;
@@ -395,12 +409,23 @@ void TestIsConnected(bool isDirected) {
   }
 }
 
+void TestFindConnectedComponents() {
+  LOG("\n===== Testing FindConnectedComponents =====" << std::endl);
+  const auto &graph = new GraphAsMatrix(4, false);
+  graph->AddEdge(0, 1);
+  graph->AddEdge(0, 2);
+  graph->AddEdge(0, 3);
+  graph->AddEdge(3, 3);
+  graph->FindConnectedComponents();
+}
+
 int main(int argc, char const *argv[]) {
-  Test(false);
-  Test(true);
-  TestDFS(false);
-  TestDFS(true);
-  TestIsConnected(false);
-  TestIsConnected(true);
+  // Test(false);
+  // Test(true);
+  // TestDFS(false);
+  // TestDFS(true);
+  // TestIsConnected(false);
+  // TestIsConnected(true);
+  TestFindConnectedComponents();
   return 0;
 }
