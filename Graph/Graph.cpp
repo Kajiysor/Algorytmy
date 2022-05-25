@@ -18,7 +18,7 @@ template <typename T>
 class Visitor
 {
 public:
-  virtual void Visit(T &v);
+  virtual void Visit(T &v){};
   virtual bool IsDone() const { return false; }
 };
 
@@ -37,7 +37,6 @@ public:
 
 class CountingVisitor : Visitor<Vertex>
 {
-private:
   int ctr{0};
   bool verbose{false};
 
