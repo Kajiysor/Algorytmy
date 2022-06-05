@@ -5,3 +5,4 @@
 *.dSYM
 *.out
 *.x
+!Makefile
